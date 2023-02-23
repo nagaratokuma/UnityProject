@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class QuizTimer : MonoBehaviour
 {
@@ -21,6 +22,17 @@ public class QuizTimer : MonoBehaviour
         float width = 1100;
         float height = 14;       
 
+        // タイマーの時間を設定
+        // シーンがQuizの時は
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Quiz")
+        {
+            LimitTime = 10;
+        }
+        // シーンがVoteの時は
+        else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Vote")
+        {
+            LimitTime = 60;
+        }
         rectTransform = gameObject.GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(width, height);
     }
@@ -41,6 +53,7 @@ public class QuizTimer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //  タイムオーバーしてない時
         if (IsTimeOver)
         {
             TimerBar();
@@ -48,10 +61,24 @@ public class QuizTimer : MonoBehaviour
             //経過時間が制限時間を超えたら
             if (ElapsedTime >= LimitTime)
             {
-                if (Quiz.instance.isSent == false)
+                // シーンがQuizの時は
+                if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Quiz")
                 {
-                    Quiz.instance.SendPlayerAnswer(false);
+                    if (Quiz.instance.isSent == false)
+                    {
+                        Quiz.instance.SendPlayerAnswer(false);
+                        IsTimeOver = false;
+                    }
                 }
+
+                // シーンがVoteの時は
+                else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Vote")
+                {
+                    
+                    IsTimeOver = false;
+
+                }
+                
             }
         }
     }

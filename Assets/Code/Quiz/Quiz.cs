@@ -18,6 +18,9 @@ public class Quiz : MonoBehaviourPunCallbacks {
     // 問題文を表示するText
     public Text questionText;
 
+    // 問題番号を表示するText
+    public Text QuizNumber;
+
     // 解答ボタン
     public Button answerButton;
 
@@ -58,6 +61,10 @@ public class Quiz : MonoBehaviourPunCallbacks {
         // 初期化
         isSent = false;
         isCorrect = false;
+        questionText.text = "";
+
+        // QuizNumberを表示
+        QuizNumber.text = "第" + (questionNumber + 1) + "問";
 
         // 格納
         string[] lines = csvFile.text.Replace("\r\n", "\n").Split("\n"[0]);
@@ -66,7 +73,9 @@ public class Quiz : MonoBehaviourPunCallbacks {
             csvDatas.Add(line.Split(','));  // string[]を追加している
         }
 
-        ShowQuestion();
+
+        // 3秒後に問題文を表示する
+        Invoke("ShowQuestion", 3.0f);
     }
 
     // 問題文を表示する関数
@@ -129,27 +138,22 @@ public class Quiz : MonoBehaviourPunCallbacks {
             }
             //Debug.Log("正解した人数: " + correctCount);
             
+            // 正解した人数をルームのカスタムプロパティに保存
+            RoomHashtable.Add("CC", correctCount);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
+
             // 問題番号を更新
             questionNumber++;
 
             // マスタークライアントのみが次のシーンをロードする
             if (PhotonNetwork.IsMasterClient)
             {
+                // 問題番号をルームのカスタムプロパティに保存
+                RoomHashtable.Add("QD", questionNumber);
+                PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
 
-                // 一人だけ不正解の場合、投票シーンをロードする
-                if (correctCount == PhotonNetwork.PlayerList.Length - 1)
-                {
-                    
-                    //Debug.Log("投票シーンをロード");
-                    PhotonNetwork.LoadLevel("Vote");
-                }
-                else 
-                {
-                    //Debug.Log("クイズシーンをロード");
-                    PhotonNetwork.LoadLevel("Quiz");
-                    //SceneManager.LoadScene (SceneManager.GetActiveScene().name);
-                    //Destroy(this.gameObject);
-                }
+                // 次のシーンをロード
+                PhotonNetwork.LoadLevel("Result");
             }
         }
     }
