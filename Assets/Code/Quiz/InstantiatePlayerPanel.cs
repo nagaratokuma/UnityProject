@@ -12,12 +12,9 @@ public class InstantiatePlayerPanel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Roomの人数を取得する
-        //int playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
-
         int counter = 0;
-        // VotePanelにPlayerPanelをRoomの自分以外の人数分追加する
-        foreach (var player in PhotonNetwork.PlayerListOthers)
+        // VotePanelにPlayerPanelをRoomの人数分追加する
+        foreach (var player in PhotonNetwork.PlayerList)
         {
             // プレハブをインスタンス化
             var playerPanel = Instantiate(PanelPrefab);
@@ -32,7 +29,7 @@ public class InstantiatePlayerPanel : MonoBehaviour
         }
         
         //VotePanel を無効化する
-        GameObject.Find("VotePanel").SetActive(false);
+        //GameObject.Find("VotePanel").SetActive(false);
     }
 
     // Update is called once per frame
