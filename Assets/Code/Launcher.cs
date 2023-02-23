@@ -9,7 +9,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
-
+    // test change on master
     [Tooltip("The Ui Panel to let the user enter name, connect and play")]
     [SerializeField] private GameObject ControlPanel;
 
