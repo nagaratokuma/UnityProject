@@ -1111,6 +1111,7 @@ MonoBehaviour:
   voteResultText: {fileID: 1081050747}
   resultText: {fileID: 1112927078}
   VotePanel: {fileID: 1364414432}
+  upperPanel: {fileID: 820488575}
   NextButton: {fileID: 1012739789}
 --- !u!1 &1740698034
 GameObject:

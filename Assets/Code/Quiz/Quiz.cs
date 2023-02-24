@@ -113,6 +113,22 @@ public class Quiz : MonoBehaviourPunCallbacks {
     {
         if (changedProps.ContainsKey("isCorrect"))
         {
+            // targetPlyaerのplayerPanelを取得する
+            var playerPanel = GameObject.Find(targetPlayer.ActorNumber.ToString());
+            if (playerPanel != null) 
+            {
+                // playerPanelの子オブジェクトのSpeechBalloonを取得する
+                var speechBalloon = playerPanel.transform.Find("SpeechBaloon").gameObject;
+                // speechBaloonの子オブジェクトのAnsweredを有効にする
+                speechBalloon.transform.Find("Answered").gameObject.SetActive(true);
+                // speechBalonnの子オブジェクトのAnsweringAnimを無効にする
+                speechBalloon.transform.Find("AnsweringAnim").gameObject.SetActive(false);
+                
+            }
+            else
+            {
+                Debug.Log("<color=red>playerPanelが見つかりませんでした。</color>");
+            }
             // playerAnswerに追加
             playerAnswer.Add(targetPlayer.NickName, (bool)changedProps["isCorrect"]);
             //Debug.Log("Player: " + targetPlayer.NickName);
@@ -151,6 +167,11 @@ public class Quiz : MonoBehaviourPunCallbacks {
                     RoomHashtable.Add("QD", questionNumber);
                     PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
 
+                    foreach (var player in PhotonNetwork.PlayerList)
+                    {
+                        Debug.Log("IsCorrectが設定されているか" + player.CustomProperties.ContainsKey("isCorrect"));
+                        Debug.Log(player.NickName);
+                    }
                     // 次のシーンをロード
                     PhotonNetwork.LoadLevel("Result");
                 }
@@ -165,6 +186,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
         // AnswerButtonのボタンを押せなくする
         answerButton.interactable = false;
 
+        Debug.Log("プレイヤーカスタムプロパティを送信");
         // カスタムプロパティを送信
         var hashtable = new ExitGames.Client.Photon.Hashtable();
         hashtable.Add("isCorrect", isCorrect);

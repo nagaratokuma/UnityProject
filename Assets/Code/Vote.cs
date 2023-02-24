@@ -21,6 +21,9 @@ public class Vote : MonoBehaviourPunCallbacks
 
     public GameObject VotePanel;
 
+    // upperPanel
+    public GameObject upperPanel;
+
     // 次の問題に進むボタン
     public Button NextButton;
 
@@ -88,10 +91,12 @@ public class Vote : MonoBehaviourPunCallbacks
         */
     }
     
-    // プレイヤーカスタムプロパティが更新されたときに呼び出される
+    // プレイヤーカスタムプロパティ"Vote"が更新されたときに呼び出される
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
         if (!changedProps.ContainsKey("Vote")) return;
+
+        
         // 投票先のプレイヤー番号を取得する
         int vote = (int)changedProps["Vote"];
         // voteCountの値を更新する
@@ -124,13 +129,6 @@ public class Vote : MonoBehaviourPunCallbacks
             // 平和村の投票数を追加する
             resultstr += "インテリ村 : " + voteCount[0] + "票";
             voteResultText.text = resultstr;
-
-            // マスタークライアントの場合
-            if (PhotonNetwork.IsMasterClient)
-            {
-                // NextButtonを表示する
-                NextButton.gameObject.SetActive(true);
-            }
             
 
             // 投票数が最大のプレイヤー番号を取得する
@@ -160,30 +158,51 @@ public class Vote : MonoBehaviourPunCallbacks
         // resultTextを非表示にする
         resultText.gameObject.SetActive(false);
 
+        // voteResultTextを非表示にする
+        voteResultText.gameObject.SetActive(false);
+
         // votePanelを表示する
         VotePanel.SetActive(true);
-        Debug.Log(InstantiatePlayerPanel.playerPanelList);
+        // votePanelの子オブジェクトlowerを無効にする
+        VotePanel.transform.Find("lower").gameObject.SetActive(false);
         
-        // playerPanelの子オブジェクトのvoteButtonを非表示にする
-        if (InstantiatePlayerPanel.playerPanelList != null)
+        // upperPanelの子オブジェクトすべてに変更を加える
+        var playerNum = 1;
+        foreach (Transform child in upperPanel.transform)
         {
-            foreach (var playerPanel in InstantiatePlayerPanel.playerPanelList)
+            // childのvoteButtonを非表示にする
+            child.Find("VoteButton").gameObject.SetActive(false);
+            // childのSpeechBaloonを表示する
+            child.Find("SpeechBaloon").gameObject.SetActive(true);
+            // プレイヤーのカスタムプロパティからiscorrectを取得する
+            foreach (var player in PhotonNetwork.PlayerList)
             {
-                // playerPanelの名前を表示する
-                Debug.Log(playerPanel.name);
-                if (playerPanel == null) 
-                {
-                    // playerPanelの型を確認する
-                    Debug.Log(playerPanel.GetType());
-                    Debug.Log("playerPanelがnullです。");
-                    continue;
-                }
-                playerPanel.transform.Find("VoteButton").gameObject.SetActive(false);
+                Debug.Log("IsCorrect == " + player.CustomProperties.ContainsKey("IsCorrect"));
             }
+            var iscorrect = PhotonNetwork.PlayerList.First(x => x.ActorNumber == playerNum).CustomProperties["isCorrect"];
+            Debug.Log("IsCorrect = " + iscorrect);
+            // iscorrectがtrueの場合
+            if ((bool)iscorrect)
+            {
+                // SpeechBaloonの子オブジェクトmaruを表示する
+                child.Find("SpeechBaloon").Find("maru").gameObject.SetActive(true);
+            }
+            // iscorrectがfalseの場合
+            else
+            {
+                // SpeechBaloonの子オブジェクトbatuを表示する
+                child.Find("SpeechBaloon").Find("batu").gameObject.SetActive(true);
+            }
+        
+            playerNum += 1;
         }
-        else
+
+
+        // マスタークライアントの場合
+        if (PhotonNetwork.IsMasterClient)
         {
-            Debug.Log("playerPanelListがnullです。");
+            // NextButtonを表示する
+            NextButton.gameObject.SetActive(true);
         }
     }
 }

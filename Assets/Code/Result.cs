@@ -12,8 +12,8 @@ public class Result : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // 2秒後に結果を表示する
-        Invoke("ShowResult", 2f);
+        // 1秒後に結果を表示する
+        Invoke("ShowResult", 1f);
 
     }
 

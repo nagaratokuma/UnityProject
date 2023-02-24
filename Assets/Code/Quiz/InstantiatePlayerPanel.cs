@@ -9,9 +9,6 @@ public class InstantiatePlayerPanel : MonoBehaviour
     // プレハブ格納用
     public GameObject PanelPrefab;
 
-    // インスタンス化したオブジェクトを格納するリスト
-    public static List<GameObject> playerPanelList = new List<GameObject>();
-
     // Start is called before the first frame update
 
     void Start()
@@ -51,9 +48,6 @@ public class InstantiatePlayerPanel : MonoBehaviour
             
             playerPanel.transform.SetParent(GameObject.Find("VotePanel/upper").transform, false);
             counter++;
-
-            // playerPanelListに追加する
-            playerPanelList.Add(playerPanel);
         }
         
         //VotePanel を無効化する
