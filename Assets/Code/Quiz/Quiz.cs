@@ -74,8 +74,8 @@ public class Quiz : MonoBehaviourPunCallbacks {
         }
 
 
-        // 3秒後に問題文を表示する
-        Invoke("ShowQuestion", 3.0f);
+        // 1秒後に問題文を表示する
+        Invoke("ShowQuestion", 1.0f);
     }
 
     // 問題文を表示する関数
@@ -117,45 +117,46 @@ public class Quiz : MonoBehaviourPunCallbacks {
             playerAnswer.Add(targetPlayer.NickName, (bool)changedProps["isCorrect"]);
             //Debug.Log("Player: " + targetPlayer.NickName);
             //Debug.Log("isCorrect: " + changedProps["isCorrect"]);
-        }
-        
-        if (playerAnswer.Count == PhotonNetwork.PlayerList.Length)
-        {
-            // 全員の回答が揃ったらここで結果を表示する
-            //Debug.Log("全員の回答が揃った");
-            foreach(KeyValuePair<string, bool> pair in playerAnswer)
+
+            if (playerAnswer.Count == PhotonNetwork.PlayerList.Length)
             {
-                Debug.Log("Player: " + pair.Key + " isCorrect: " + pair.Value);
-            }
-            // 正解した人数をカウントする変数
-            int correctCount = 0;
-            foreach(KeyValuePair<string, bool> pair in playerAnswer)
-            {
-                if (pair.Value == true)
+                // 全員の回答が揃ったらここで結果を表示する
+                //Debug.Log("全員の回答が揃った");
+                foreach(KeyValuePair<string, bool> pair in playerAnswer)
                 {
-                    correctCount++;
+                    Debug.Log("Player: " + pair.Key + " isCorrect: " + pair.Value);
                 }
-            }
-            //Debug.Log("正解した人数: " + correctCount);
-            
-            // 正解した人数をルームのカスタムプロパティに保存
-            RoomHashtable.Add("CC", correctCount);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
-
-            // 問題番号を更新
-            questionNumber++;
-
-            // マスタークライアントのみが次のシーンをロードする
-            if (PhotonNetwork.IsMasterClient)
-            {
-                // 問題番号をルームのカスタムプロパティに保存
-                RoomHashtable.Add("QD", questionNumber);
+                // 正解した人数をカウントする変数
+                int correctCount = 0;
+                foreach(KeyValuePair<string, bool> pair in playerAnswer)
+                {
+                    if (pair.Value == true)
+                    {
+                        correctCount++;
+                    }
+                }
+                //Debug.Log("正解した人数: " + correctCount);
+                
+                // 正解した人数をルームのカスタムプロパティに保存
+                RoomHashtable.Add("CC", correctCount);
                 PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
 
-                // 次のシーンをロード
-                PhotonNetwork.LoadLevel("Result");
+                // 問題番号を更新
+                questionNumber++;
+
+                // マスタークライアントのみが次のシーンをロードする
+                if (PhotonNetwork.IsMasterClient)
+                {
+                    // 問題番号をルームのカスタムプロパティに保存
+                    RoomHashtable.Add("QD", questionNumber);
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
+
+                    // 次のシーンをロード
+                    PhotonNetwork.LoadLevel("Result");
+                }
             }
         }
+        
     }
 
     // タイマーが制限時間を超えたら呼ばれる関数
