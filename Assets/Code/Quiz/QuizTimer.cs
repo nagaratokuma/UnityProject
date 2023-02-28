@@ -66,7 +66,7 @@ public class QuizTimer : MonoBehaviour
                 {
                     if (Quiz.instance.isSent == false)
                     {
-                        Quiz.instance.SendPlayerAnswer(false);
+                        Quiz.instance.SendPlayerAnswer(false, null);
                         IsTimeOver = false;
                     }
                 }

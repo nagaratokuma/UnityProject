@@ -210,7 +210,7 @@ public class Vote : MonoBehaviourPunCallbacks
                 // VotedOrNoBakaTextを表示する
                 VotedOrNoBaka.gameObject.SetActive(true);
                 // 最も多く投票されたプレイヤーのPanelを表示する
-                ShowOnePlayerPanel(maxVotePlayer.ActorNumber);
+                ShowOnePlayerPanel(maxVotePlayer.ActorNumber, false);
             }
             
             // 3秒後にShowBakaResultText()を呼び出す
@@ -242,7 +242,7 @@ public class Vote : MonoBehaviourPunCallbacks
                 VotedOrNoBaka.text = "が処刑されました。";
                 VotedOrNoBaka.gameObject.SetActive(true);
                 // 最も多く投票されたプレイヤーのPanelを表示する
-                ShowOnePlayerPanel(randomSelected);
+                ShowOnePlayerPanel(randomSelected, false);
             }
 
             // 投票の正誤を判定してポイントを加算する
@@ -303,7 +303,7 @@ public class Vote : MonoBehaviourPunCallbacks
                 Debug.Log(wrongPlayer.NickName + "が間違えました。");
                 
                 // 間違えたプレイヤー以外のPanelを非表示にする
-                ShowOnePlayerPanel(wrongPlayer.ActorNumber);
+                ShowOnePlayerPanel(wrongPlayer.ActorNumber, true);
             }
         }
         else
@@ -325,7 +325,7 @@ public class Vote : MonoBehaviourPunCallbacks
     }
 
     // 入力されたプレーヤーのパネルのみを表示する関数
-    public void ShowOnePlayerPanel(int playerNum)
+    public void ShowOnePlayerPanel(int playerNum, bool isBaka)
     {
         // upperPanelの子オブジェクトを全て取得する
         var upperPanel = VotePanel.transform.Find("upper").gameObject;
@@ -345,6 +345,20 @@ public class Vote : MonoBehaviourPunCallbacks
                 upperPanel.transform.Find(player.ActorNumber.ToString()).gameObject.SetActive(true);
                 // VoteButtonを非表示にする
                 upperPanel.transform.Find(player.ActorNumber.ToString()).Find("VoteButton").gameObject.SetActive(false);
+                // バカを表示するときは解答を表示する
+                if (isBaka == true)
+                {
+                    if (player.CustomProperties.ContainsKey("Answer") == null)
+                    {
+                        // AnswerTextを設定する
+                        upperPanel.transform.Find(player.ActorNumber.ToString()).Find("Answer").GetComponent<Text>().text = "解答なし";
+                    }
+                    // AnswerTextを設定する
+                    upperPanel.transform.Find(player.ActorNumber.ToString()).Find("Answer").GetComponent<Text>().text = "「" + player.CustomProperties["Answer"].ToString() + "」";
+                    // AnswerTextを表示する
+                    upperPanel.transform.Find(player.ActorNumber.ToString()).Find("Answer").gameObject.SetActive(true);
+                }
+                
             }
         }
     }

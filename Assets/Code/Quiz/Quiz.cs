@@ -127,9 +127,10 @@ public class Quiz : MonoBehaviourPunCallbacks {
         } else {
             isCorrect = false;
         }
-        
+        // 解答を送信
+
         // 正誤判定を送信
-        SendPlayerAnswer(isCorrect);   
+        SendPlayerAnswer(isCorrect, answer);   
     }
 
     // プレイヤーカスタムプロパティを受け取ったときに呼ばれる関数
@@ -207,13 +208,20 @@ public class Quiz : MonoBehaviourPunCallbacks {
 
     // タイマーが制限時間を超えたら呼ばれる関数
     // プレイヤーカスタムプロパティを送信する関数（引数: 正誤判定）
-    public void SendPlayerAnswer(bool isCorrect){
+    public void SendPlayerAnswer(bool isCorrect, string Answer){
         // AnswerButtonのボタンを押せなくする
         answerButton.interactable = false;
 
+        var hashtable = new ExitGames.Client.Photon.Hashtable();
+
+        // 不正解だった場合のみ解答を送信
+        if (isCorrect == false)
+        {
+            hashtable.Add("Answer", Answer);
+        }
         Debug.Log("プレイヤーカスタムプロパティを送信");
         // カスタムプロパティを送信
-        var hashtable = new ExitGames.Client.Photon.Hashtable();
+        
         // 正誤判定を送信
         hashtable.Add("isCorrect", isCorrect);
         // 正解の場合
