@@ -28,6 +28,16 @@ public class Result : MonoBehaviour
         // 不正解者数が一人の時
         if (playerCount - correctCount == 1)
         {
+            // 不正解者のIDを取得してルームのカスタムプロパティに格納する
+            foreach (var player in PhotonNetwork.PlayerList)
+            {
+                if ((bool)player.CustomProperties["isCorrect"] == false)
+                {
+                    //ルームのカスタムプロパティに不正解者のIDを格納する
+                    PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "VoteAnswer", player.ActorNumber} });
+                }
+            }
+            
             resultText.text = "この中にバカが一人いました。バカを見つけてください。";
             // 2秒後にvoteシーンに遷移する
             Invoke("Vote", 2f);
@@ -35,6 +45,8 @@ public class Result : MonoBehaviour
         // 全員正解だった場合
         else if (playerCount == correctCount)
         {
+            // ルームのカスタムプロパティに投票の正解を格納する
+            PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "VoteAnswer", 0 } });
             resultText.text = "この中にバカが一人いました。バカを見つけてください。";
             // 2秒後にQuizシーンに遷移する
             Invoke("Vote", 2f);

@@ -33,6 +33,10 @@ public class Vote : MonoBehaviourPunCallbacks
     // 「この中にバカはいませんでした」Text
     public Text NoBakaText;
 
+    // 「が処刑されました」or 「インテリ村が最も多く投票されました。」Text
+    public Text VotedOrNoBaka;
+
+    // 「」
     // プレイヤーごとの投票された数を格納する辞書
     Dictionary<int, int> voteCount = new Dictionary<int, int>();
 
@@ -107,9 +111,15 @@ public class Vote : MonoBehaviourPunCallbacks
     // プレイヤーカスタムプロパティ"Vote"が更新されたときに呼び出される
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
+        if (changedProps.ContainsKey("VC") || changedProps.ContainsKey("DC")) 
+        {
+            Debug.Log("Vote: " + targetPlayer.NickName + "のカスタムプロパティが更新されました。");
+        }
         if (!changedProps.ContainsKey("Vote")) return;
 
-        
+        // ルームのカスタムプロパティから正解数を取得する
+        int correctCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["CC"];
+
         // 投票先のプレイヤー番号を取得する
         int vote = (int)changedProps["Vote"];
         // voteCountの値を更新する
@@ -120,7 +130,7 @@ public class Vote : MonoBehaviourPunCallbacks
             Debug.Log(targetPlayer.NickName + "が" + votedPlayer + "に投票しました。");
         }
         
-        
+
         // 全員の投票が終わったかどうかを判定する
         if (voteCount.Sum(x => x.Value) == PhotonNetwork.PlayerList.Length)
         {
@@ -144,25 +154,104 @@ public class Vote : MonoBehaviourPunCallbacks
                 resultstr += player.NickName + " : " + count + "票" + "   ";
                 Debug.Log(player.NickName + "は" + count + "票");
             }
-            // 平和村の投票数を追加する
+            // インテリ村の投票数を追加する
             resultstr += "インテリ村 : " + voteCount[0] + "票";
             voteResultText.text = resultstr;
-            
-/*
+        
             // 投票数が最大のプレイヤー番号を取得する
             var maxVote = voteCount.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
-            // 投票数が最大のプレイヤーを取得する
-            var maxVotePlayer = PhotonNetwork.PlayerList.First(x => x.ActorNumber == maxVote);
-            // 投票数が最大のプレイヤーの名前を取得する
-            var maxVotePlayerName = maxVotePlayer.NickName;
-            // 投票数が最大のプレイヤーの名前を表示する
-            Debug.Log("<color=blue>" + maxVotePlayerName + "</color>が最も多く投票されました。");
-*/
+            //  最大の投票数がほかにもあった場合
+            if (voteCount.Count(x => x.Value == voteCount[maxVote]) > 1)
+            {
+                // マスタークラインとのみ処理を行う
+                if (!PhotonNetwork.IsMasterClient) return;
+                Debug.Log("最大の投票数が複数あります。");
+                //　ランダムにプレイヤーを選ぶ
+                // voteCountの値がvoteCount[maxVote]と同じキーを取得する
+                var duplicated = voteCount.GroupBy( c => c.Value ).Where( g => g.Key == voteCount[maxVote] ).SelectMany( g => g.Select( c => c.Key ) ).ToList();
+                Debug.Log("duplicated: " + duplicated);
+                var random = new System.Random();
+                var randomSelect = duplicated[random.Next(0, duplicated.Count())];
+                Debug.Log("randomSelect: " + randomSelect);
+                // ルームのカスタムプロパティにランダムに選んだプレイヤー番号を格納する
+                var RoomHashtable = new Hashtable();
+                RoomHashtable["RS"] = randomSelect;
+                PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
+                return;
+            }
+            
+            // インテリ村が最も多く投票された場合
+            if (maxVote == 0)
+            {
+                // VotedOrNoBakaTextを変更する
+                VotedOrNoBaka.text = "インテリ村が最も多く投票されました。";
+                // VotedOrNoBakaTextを表示する
+                VotedOrNoBaka.gameObject.SetActive(true);
+                
+                // 投票の正誤を判定してポイントを加算する
+                JudgeVoteResult(maxVote);
+
+                // 3秒後にShowBakaResultText()を呼び出す
+                Invoke("ShowBakaResultText", 5.0f);
+            }
+            else 
+            {
+                // 処刑者が一人選ばれる場合
+                // 投票数が最大のプレイヤーを取得する
+                var maxVotePlayer = PhotonNetwork.PlayerList.First(x => x.ActorNumber == maxVote);
+                // 投票数が最大のプレイヤーの名前を取得する
+                var maxVotePlayerName = maxVotePlayer.NickName;
+                // 投票数が最大のプレイヤーの名前を表示する
+                Debug.Log("<color=blue>" + maxVotePlayerName + "</color>が最も多く投票されました。");
+
+                // 投票の正誤を判定してポイントを加算する
+                JudgeVoteResult(maxVote);
+
+                // VotedOrNoBakaTextを表示する
+                VotedOrNoBaka.gameObject.SetActive(true);
+                // 最も多く投票されたプレイヤーのPanelを表示する
+                ShowOnePlayerPanel(maxVotePlayer.ActorNumber);
+            }
+            
+            // 3秒後にShowBakaResultText()を呼び出す
+            Invoke("ShowBakaResultText", 5.0f);
+        }
+    }
+
+    // ルームのカスタムプロパティが更新されたときに呼び出される
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    {
+        // ルームのカスタムプロパティから処刑者を取得する
+        if (propertiesThatChanged.ContainsKey("RS"))
+        {
+            var randomSelected = (int)propertiesThatChanged["RS"];
+            // 処刑者を表示する
+            Debug.Log("処刑者: " + randomSelected);
+            
+            // randomSelectedが0の場合
+            if (randomSelected == 0)
+            {
+                // VotedOrNoBakaTextを変更する
+                VotedOrNoBaka.text = "インテリ村が最も多く投票されました。";
+                // VotedOrNoBakaTextを表示する
+                VotedOrNoBaka.gameObject.SetActive(true);
+            }
+            else 
+            {
+                // VotedOrNoBakaTextを表示する
+                VotedOrNoBaka.text = "が処刑されました。";
+                VotedOrNoBaka.gameObject.SetActive(true);
+                // 最も多く投票されたプレイヤーのPanelを表示する
+                ShowOnePlayerPanel(randomSelected);
+            }
+
+            // 投票の正誤を判定してポイントを加算する
+            JudgeVoteResult(randomSelected);
 
             // BakaResultTextを表示する
             BakaResultText.gameObject.SetActive(true);
-            // 3秒後にShowQuizResult()を呼び出す
-            Invoke("ShowQuizResult", 5.0f);
+            // 3秒後にShowBakaResultText()を呼び出す
+            Invoke("ShowBakaResultText", 5.0f);
         }
     }
 
@@ -173,9 +262,10 @@ public class Vote : MonoBehaviourPunCallbacks
         PhotonNetwork.LoadLevel("Quiz");
     }
 
-    // クイズの結果を表示する関数
-    public void ShowQuizResult()
+    public void ShowBakaResultText()
     {
+        // VotedOrNoBakaTextを非表示する
+        VotedOrNoBaka.gameObject.SetActive(false);
         // BakaResultTextを非表示にする
         BakaResultText.gameObject.SetActive(false);
 
@@ -183,6 +273,19 @@ public class Vote : MonoBehaviourPunCallbacks
         resultText.gameObject.SetActive(false);
         // voteResultTextを非表示にする
         voteResultText.gameObject.SetActive(false);
+
+        // VotePanelを非表示にする
+        VotePanel.SetActive(false);
+
+        // BakaResultTextを表示する
+        BakaResultText.gameObject.SetActive(true);
+        // ３秒後にShowQuizResult()を呼び出す
+        Invoke("ShowQuizResult", 3.0f);
+    }
+    // クイズの結果を表示する関数
+    public void ShowQuizResult()
+    {
+        
 
         // ルームのカスタムプロパティから正解者数を取得する
         if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("CC"))
@@ -197,29 +300,13 @@ public class Vote : MonoBehaviourPunCallbacks
             else
             {
                 // バカが一人いた場合
-                // upperPanelの子オブジェクトを全て取得する
-                var upperPanel = VotePanel.transform.Find("upper").gameObject;
-                // votePanelを表示する
-                VotePanel.SetActive(true);
-                // votePanelの子オブジェクトlowerを無効にする
-                VotePanel.transform.Find("lower").gameObject.SetActive(false);
                 
                 // IsCorrectがfalseのプレイヤーを取得する
                 var wrongPlayer = PhotonNetwork.PlayerList.First(x => (bool)x.CustomProperties["isCorrect"] == false);
                 Debug.Log(wrongPlayer.NickName + "が間違えました。");
-                // 名前がwrongPlayers.ActorNumberのオブジェクト以外を非表示にする
-                foreach (var player in PhotonNetwork.PlayerList)
-                {
-                    if (player.ActorNumber != wrongPlayer.ActorNumber)
-                    {
-                        upperPanel.transform.Find(player.ActorNumber.ToString()).gameObject.SetActive(false);
-                    }
-                    else
-                    {
-                        // VoteButtonを非表示にする
-                        upperPanel.transform.Find(player.ActorNumber.ToString()).Find("VoteButton").gameObject.SetActive(false);
-                    }
-                }
+                
+                // 間違えたプレイヤー以外のPanelを非表示にする
+                ShowOnePlayerPanel(wrongPlayer.ActorNumber);
             }
         }
         else
@@ -239,4 +326,65 @@ public class Vote : MonoBehaviourPunCallbacks
             NextButton.gameObject.SetActive(true);
         }
     }
+
+    // 入力されたプレーヤーのパネルのみを表示する関数
+    public void ShowOnePlayerPanel(int playerNum)
+    {
+        // upperPanelの子オブジェクトを全て取得する
+        var upperPanel = VotePanel.transform.Find("upper").gameObject;
+        // votePanelを表示する
+        VotePanel.SetActive(true);
+        // votePanelの子オブジェクトlowerを無効にする
+        VotePanel.transform.Find("lower").gameObject.SetActive(false);
+        // IDがplayerNumのオブジェクト以外を非表示にする
+        foreach (var player in PhotonNetwork.PlayerList)
+        {
+            if (player.ActorNumber != playerNum)
+            {
+                upperPanel.transform.Find(player.ActorNumber.ToString()).gameObject.SetActive(false);
+            }
+            else
+            {
+                // VoteButtonを非表示にする
+                upperPanel.transform.Find(player.ActorNumber.ToString()).Find("VoteButton").gameObject.SetActive(false);
+            }
+        }
+    }
+
+    // プレイヤーの投票の結果を判定する関数
+    public void JudgeVoteResult(int MaxVote)
+    {
+        // LocalPlayerの投票先が最大の投票数かつ、あっていた場合
+        if ((int)PhotonNetwork.LocalPlayer.CustomProperties["Vote"] == MaxVote && (int)PhotonNetwork.CurrentRoom.CustomProperties["VoteAnswer"] == MaxVote)
+        {
+            // プレイヤーのカスタムプロパティのVCを更新する
+            IncrementPlayerCustomProperties("VC");
+        }
+        
+        // LocalPlayerがバカで処刑されなかった場合
+        if ((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCorrect"] == false && (int)PhotonNetwork.LocalPlayer.ActorNumber != MaxVote)
+        {
+            // プレイヤーのカスタムプロパティのDCを更新する
+            IncrementPlayerCustomProperties("DC");
+        }
+    }
+
+    // プレイヤーのカスタムプロパティを更新する関数
+    public void IncrementPlayerCustomProperties(string key)
+    {
+        Debug.Log("IncrementPlayerCustomProperties  Key == " + key);
+        // プレイヤーのカスタムプロパティを更新する
+        var PlayerHashtable = new Hashtable();
+        if (!PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(key))
+        {
+            PlayerHashtable[key] = 1;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(PlayerHashtable);
+            return;
+        }
+        var preValue = (int)PhotonNetwork.LocalPlayer.CustomProperties[key];
+        PlayerHashtable[key] = preValue + 1;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(PlayerHashtable);
+    }
+
+    
 }

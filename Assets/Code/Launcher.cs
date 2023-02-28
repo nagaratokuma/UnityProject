@@ -57,7 +57,6 @@ public class Launcher : MonoBehaviourPunCallbacks
         EnterButton.GetComponent<Button>().interactable = false;
         // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
         PhotonNetwork.ConnectUsingSettings();
-
     }
 
     // ルーム入室/作成ボタンが押されたときに呼ばれる

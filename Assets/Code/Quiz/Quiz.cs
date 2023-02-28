@@ -12,6 +12,9 @@ public class Quiz : MonoBehaviourPunCallbacks {
     public static Quiz instance;
     public TextAsset csvFile;// GUIでcsvファイルを割当
 
+    // Quizの問題数
+    public int MaxQuizNum = 2;
+
     // AnswerInputField
     public InputField answerInputField;
 
@@ -30,9 +33,11 @@ public class Quiz : MonoBehaviourPunCallbacks {
     // 正誤判定を送信したかどうかを格納する変数
     public bool isSent = false;
 
-    // 問題番号を格納する変数
-    public static int questionNumber = 0;
+    // csvから参照するのに使う問題番号を格納する変数
+    public static int questionNumber = 1;
 
+    // 問題番号を格納する変数
+    public static int QuizNumInt = 1;
     // CSVのデータを入れるリスト
     List<string[]> csvDatas = new List<string[]>();// 追記
 
@@ -54,6 +59,26 @@ public class Quiz : MonoBehaviourPunCallbacks {
         {
             Destroy(this.gameObject);
         }
+
+        // プレイヤーカスタムプロパティから正解数を取得
+        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("QC") == false) {
+            Debug.Log("QCがありません");
+        }
+        else 
+        {
+            Debug.Log("正解数: " + PhotonNetwork.LocalPlayer.CustomProperties["QC"]);
+        }
+
+        // マスタークライアントの場合
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 50問終了したら
+            if (QuizNumInt > MaxQuizNum)
+            {
+                // GameResultシーンに遷移
+                PhotonNetwork.LoadLevel("GameResult");
+            }     
+        }
     }
 
     // Use this for initialization
@@ -64,7 +89,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
         questionText.text = "";
 
         // QuizNumberを表示
-        QuizNumber.text = "第" + (questionNumber + 1) + "問";
+        QuizNumber.text = "第" + QuizNumInt + "問";
 
         // 格納
         string[] lines = csvFile.text.Replace("\r\n", "\n").Split("\n"[0]);
@@ -72,7 +97,6 @@ public class Quiz : MonoBehaviourPunCallbacks {
             if (line == "") {continue;}
             csvDatas.Add(line.Split(','));  // string[]を追加している
         }
-
 
         // 1秒後に問題文を表示する
         Invoke("ShowQuestion", 1.0f);
@@ -159,6 +183,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
 
                 // 問題番号を更新
                 questionNumber++;
+                QuizNumInt++;
 
                 // マスタークライアントのみが次のシーンをロードする
                 if (PhotonNetwork.IsMasterClient)
@@ -189,7 +214,21 @@ public class Quiz : MonoBehaviourPunCallbacks {
         Debug.Log("プレイヤーカスタムプロパティを送信");
         // カスタムプロパティを送信
         var hashtable = new ExitGames.Client.Photon.Hashtable();
+        // 正誤判定を送信
         hashtable.Add("isCorrect", isCorrect);
+        // 正解の場合
+        if (isCorrect == true)
+        {
+            // カスタムプロパティに正解数を保存
+            if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("QC") == false)
+            {
+                hashtable.Add("QC", 1);
+            }
+            else
+            {
+                hashtable.Add("QC", (int)PhotonNetwork.LocalPlayer.CustomProperties["QC"] + 1);
+            }
+        }
         PhotonNetwork.LocalPlayer.SetCustomProperties(hashtable);
         isSent = true;
     }
