@@ -248,8 +248,6 @@ public class Vote : MonoBehaviourPunCallbacks
             // 投票の正誤を判定してポイントを加算する
             JudgeVoteResult(randomSelected);
 
-            // BakaResultTextを表示する
-            BakaResultText.gameObject.SetActive(true);
             // 3秒後にShowBakaResultText()を呼び出す
             Invoke("ShowBakaResultText", 5.0f);
         }
@@ -266,8 +264,6 @@ public class Vote : MonoBehaviourPunCallbacks
     {
         // VotedOrNoBakaTextを非表示する
         VotedOrNoBaka.gameObject.SetActive(false);
-        // BakaResultTextを非表示にする
-        BakaResultText.gameObject.SetActive(false);
 
         // resultTextを非表示にする
         resultText.gameObject.SetActive(false);
@@ -285,6 +281,7 @@ public class Vote : MonoBehaviourPunCallbacks
     // クイズの結果を表示する関数
     public void ShowQuizResult()
     {
+        
         
 
         // ルームのカスタムプロパティから正解者数を取得する
@@ -345,6 +342,7 @@ public class Vote : MonoBehaviourPunCallbacks
             }
             else
             {
+                upperPanel.transform.Find(player.ActorNumber.ToString()).gameObject.SetActive(true);
                 // VoteButtonを非表示にする
                 upperPanel.transform.Find(player.ActorNumber.ToString()).Find("VoteButton").gameObject.SetActive(false);
             }
