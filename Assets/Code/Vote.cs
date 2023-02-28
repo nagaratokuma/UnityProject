@@ -30,6 +30,9 @@ public class Vote : MonoBehaviourPunCallbacks
     // 次の問題に進むボタン
     public Button NextButton;
 
+    // 「この中にバカはいませんでした」Text
+    public Text NoBakaText;
+
     // プレイヤーごとの投票された数を格納する辞書
     Dictionary<int, int> voteCount = new Dictionary<int, int>();
 
@@ -155,6 +158,7 @@ public class Vote : MonoBehaviourPunCallbacks
             // 投票数が最大のプレイヤーの名前を表示する
             Debug.Log("<color=blue>" + maxVotePlayerName + "</color>が最も多く投票されました。");
 */
+
             // BakaResultTextを表示する
             BakaResultText.gameObject.SetActive(true);
             // 3秒後にShowQuizResult()を呼び出す
@@ -180,31 +184,48 @@ public class Vote : MonoBehaviourPunCallbacks
         // voteResultTextを非表示にする
         voteResultText.gameObject.SetActive(false);
 
-        // upperPanelの子オブジェクトを全て取得する
-        var upperPanel = VotePanel.transform.Find("upper").gameObject;
-        // votePanelを表示する
-        VotePanel.SetActive(true);
-        // votePanelの子オブジェクトlowerを無効にする
-        VotePanel.transform.Find("lower").gameObject.SetActive(false);
-        
-        // IsCorrectがfalseのプレイヤーを取得する
-        var wrongPlayer = PhotonNetwork.PlayerList.First(x => (bool)x.CustomProperties["isCorrect"] == false);
-        Debug.Log(wrongPlayer.NickName + "が間違えました。");
-        // 名前がwrongPlayers.ActorNumberのオブジェクト以外を非表示にする
-        foreach (var player in PhotonNetwork.PlayerList)
+        // ルームのカスタムプロパティから正解者数を取得する
+        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("CC"))
         {
-            if (player.ActorNumber != wrongPlayer.ActorNumber)
+            var answerCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["CC"];
+            // 全員正解の場合
+            if (answerCount == PhotonNetwork.PlayerList.Length)
             {
-                upperPanel.transform.Find(player.ActorNumber.ToString()).gameObject.SetActive(false);
+                // NoBakaTextを表示する
+                NoBakaText.gameObject.SetActive(true); // 「この村にバカはいませんでした。」
             }
             else
             {
-                // VoteButtonを非表示にする
-                upperPanel.transform.Find(player.ActorNumber.ToString()).Find("VoteButton").gameObject.SetActive(false);
+                // バカが一人いた場合
+                // upperPanelの子オブジェクトを全て取得する
+                var upperPanel = VotePanel.transform.Find("upper").gameObject;
+                // votePanelを表示する
+                VotePanel.SetActive(true);
+                // votePanelの子オブジェクトlowerを無効にする
+                VotePanel.transform.Find("lower").gameObject.SetActive(false);
+                
+                // IsCorrectがfalseのプレイヤーを取得する
+                var wrongPlayer = PhotonNetwork.PlayerList.First(x => (bool)x.CustomProperties["isCorrect"] == false);
+                Debug.Log(wrongPlayer.NickName + "が間違えました。");
+                // 名前がwrongPlayers.ActorNumberのオブジェクト以外を非表示にする
+                foreach (var player in PhotonNetwork.PlayerList)
+                {
+                    if (player.ActorNumber != wrongPlayer.ActorNumber)
+                    {
+                        upperPanel.transform.Find(player.ActorNumber.ToString()).gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        // VoteButtonを非表示にする
+                        upperPanel.transform.Find(player.ActorNumber.ToString()).Find("VoteButton").gameObject.SetActive(false);
+                    }
+                }
             }
         }
-        
-        
+        else
+        {
+            Debug.Log("正解者数が取得できませんでした。");
+        }
 
         // upperPanelの子オブジェクトすべてに変更を加える
         var playerNum = 1;

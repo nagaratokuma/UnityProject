@@ -32,6 +32,13 @@ public class Result : MonoBehaviour
             // 2秒後にvoteシーンに遷移する
             Invoke("Vote", 2f);
         }
+        // 全員正解だった場合
+        else if (playerCount == correctCount)
+        {
+            resultText.text = "この中にバカが一人いました。バカを見つけてください。";
+            // 2秒後にQuizシーンに遷移する
+            Invoke("Vote", 2f);
+        }
         else
         {
             resultText.text = "正解したのは" + correctCount + "人でした。次の問題に進みます。";

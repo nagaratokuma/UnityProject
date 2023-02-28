@@ -137,7 +137,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
             if (playerAnswer.Count == PhotonNetwork.PlayerList.Length)
             {
                 // 全員の回答が揃ったらここで結果を表示する
-                //Debug.Log("全員の回答が揃った");
+
                 foreach(KeyValuePair<string, bool> pair in playerAnswer)
                 {
                     Debug.Log("Player: " + pair.Key + " isCorrect: " + pair.Value);
