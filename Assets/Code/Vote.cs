@@ -19,10 +19,13 @@ public class Vote : MonoBehaviourPunCallbacks
     public Text voteResultText;
     public Text resultText;
 
+    public Button NoBakaButton;
     public GameObject VotePanel;
 
     // upperPanel
     public GameObject upperPanel;
+
+    public Text BakaResultText;
 
     // 次の問題に進むボタン
     public Button NextButton;
@@ -82,7 +85,14 @@ public class Vote : MonoBehaviourPunCallbacks
             Debug.Log(parentName);
         }
         
-
+        // VoteButtonを押せなくする
+        foreach (var player in PhotonNetwork.PlayerList)
+        {
+            var playerPanel = upperPanel.transform.Find(player.ActorNumber.ToString());
+            playerPanel.Find("VoteButton").GetComponent<Button>().interactable = false;
+        }
+        // NoBakaButtonを押せなくする
+        NoBakaButton.interactable = false;
         /*
         // 押されたボタンの名前から投票先のプレイヤー番号を取得する
         var vote = buttonName;
@@ -101,8 +111,13 @@ public class Vote : MonoBehaviourPunCallbacks
         int vote = (int)changedProps["Vote"];
         // voteCountの値を更新する
         voteCount[vote]++;
-        var votedPlayer = PhotonNetwork.PlayerList.First(x => x.ActorNumber == vote);
-        Debug.Log(targetPlayer.NickName + "が" + votedPlayer + "に投票しました。");
+        if (vote != 0)
+        {
+            var votedPlayer = PhotonNetwork.PlayerList.First(x => x.ActorNumber == vote);
+            Debug.Log(targetPlayer.NickName + "が" + votedPlayer + "に投票しました。");
+        }
+        
+        
         // 全員の投票が終わったかどうかを判定する
         if (voteCount.Sum(x => x.Value) == PhotonNetwork.PlayerList.Length)
         {
@@ -130,7 +145,7 @@ public class Vote : MonoBehaviourPunCallbacks
             resultstr += "インテリ村 : " + voteCount[0] + "票";
             voteResultText.text = resultstr;
             
-
+/*
             // 投票数が最大のプレイヤー番号を取得する
             var maxVote = voteCount.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
             // 投票数が最大のプレイヤーを取得する
@@ -139,9 +154,11 @@ public class Vote : MonoBehaviourPunCallbacks
             var maxVotePlayerName = maxVotePlayer.NickName;
             // 投票数が最大のプレイヤーの名前を表示する
             Debug.Log("<color=blue>" + maxVotePlayerName + "</color>が最も多く投票されました。");
-
+*/
+            // BakaResultTextを表示する
+            BakaResultText.gameObject.SetActive(true);
             // 3秒後にShowQuizResult()を呼び出す
-            Invoke("ShowQuizResult", 3.0f);
+            Invoke("ShowQuizResult", 5.0f);
         }
     }
 
@@ -155,47 +172,43 @@ public class Vote : MonoBehaviourPunCallbacks
     // クイズの結果を表示する関数
     public void ShowQuizResult()
     {
+        // BakaResultTextを非表示にする
+        BakaResultText.gameObject.SetActive(false);
+
         // resultTextを非表示にする
         resultText.gameObject.SetActive(false);
-
         // voteResultTextを非表示にする
         voteResultText.gameObject.SetActive(false);
 
+        // upperPanelの子オブジェクトを全て取得する
+        var upperPanel = VotePanel.transform.Find("upper").gameObject;
         // votePanelを表示する
         VotePanel.SetActive(true);
         // votePanelの子オブジェクトlowerを無効にする
         VotePanel.transform.Find("lower").gameObject.SetActive(false);
         
-        // upperPanelの子オブジェクトすべてに変更を加える
-        var playerNum = 1;
-        foreach (Transform child in upperPanel.transform)
+        // IsCorrectがfalseのプレイヤーを取得する
+        var wrongPlayer = PhotonNetwork.PlayerList.First(x => (bool)x.CustomProperties["isCorrect"] == false);
+        Debug.Log(wrongPlayer.NickName + "が間違えました。");
+        // 名前がwrongPlayers.ActorNumberのオブジェクト以外を非表示にする
+        foreach (var player in PhotonNetwork.PlayerList)
         {
-            // childのvoteButtonを非表示にする
-            child.Find("VoteButton").gameObject.SetActive(false);
-            // childのSpeechBaloonを表示する
-            child.Find("SpeechBaloon").gameObject.SetActive(true);
-            // プレイヤーのカスタムプロパティからiscorrectを取得する
-            foreach (var player in PhotonNetwork.PlayerList)
+            if (player.ActorNumber != wrongPlayer.ActorNumber)
             {
-                Debug.Log("IsCorrect == " + player.CustomProperties.ContainsKey("IsCorrect"));
+                upperPanel.transform.Find(player.ActorNumber.ToString()).gameObject.SetActive(false);
             }
-            var iscorrect = PhotonNetwork.PlayerList.First(x => x.ActorNumber == playerNum).CustomProperties["isCorrect"];
-            Debug.Log("IsCorrect = " + iscorrect);
-            // iscorrectがtrueの場合
-            if ((bool)iscorrect)
-            {
-                // SpeechBaloonの子オブジェクトmaruを表示する
-                child.Find("SpeechBaloon").Find("maru").gameObject.SetActive(true);
-            }
-            // iscorrectがfalseの場合
             else
             {
-                // SpeechBaloonの子オブジェクトbatuを表示する
-                child.Find("SpeechBaloon").Find("batu").gameObject.SetActive(true);
+                // VoteButtonを非表示にする
+                upperPanel.transform.Find(player.ActorNumber.ToString()).Find("VoteButton").gameObject.SetActive(false);
             }
-        
-            playerNum += 1;
         }
+        
+        
+
+        // upperPanelの子オブジェクトすべてに変更を加える
+        var playerNum = 1;
+        
 
 
         // マスタークライアントの場合

@@ -9,7 +9,7 @@ public class QuizTimer : MonoBehaviour
     public float width = 1100;
     public float height = 14;
     //タイマーの時間
-    public float LimitTime = 10;
+    public float LimitTime = 30;
     //経過時間
     private float ElapsedTime = 0;
     public RectTransform rectTransform;
@@ -26,7 +26,7 @@ public class QuizTimer : MonoBehaviour
         // シーンがQuizの時は
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Quiz")
         {
-            LimitTime = 10;
+            LimitTime = 25;
         }
         // シーンがVoteの時は
         else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Vote")

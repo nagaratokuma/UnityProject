@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 1037
   m_ShowMode: 4
-  m_Title: Scene
+  m_Title: Project
   m_RootView: {fileID: 6}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 19
+  controlID: 49
 --- !u!114 &3
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -68,8 +68,8 @@ MonoBehaviour:
     y: 0
     width: 454
     height: 987
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 71}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
@@ -223,7 +223,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 20
+  controlID: 50
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -248,7 +248,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 21
+  controlID: 51
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -359,9 +359,9 @@ MonoBehaviour:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 78610000
-    m_LastClickedID: 24952
-    m_ExpandedIDs: 00000000f4600000f6600000f8600000328800001e8c00002690000098900000c295000000ca9a3b
+    m_SelectedIDs: ce620000
+    m_LastClickedID: 25294
+    m_ExpandedIDs: 00000000326200003462000036620000386200003a6200003c6200003e620000406200004262000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -389,7 +389,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000f4600000f6600000f8600000
+    m_ExpandedIDs: 00000000326200003462000036620000386200003a6200003c6200003e6200004062000042620000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -517,9 +517,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: ee640000
+      m_SelectedIDs: da620000
       m_LastClickedID: 0
-      m_ExpandedIDs: 7226fcff1427fcffa827fcffe62cfcff7a2ffcff9c30fcff2831fcffcc31fcff8036fcff9236fcff9c36fcff7239fcffee3dfcffb03ffcff9c43fcffa643fcff2c46fcff3646fcff065cfcff9a5efcffc863fcff9066fcff7c67fcff6469fcff2277fcff2c77fcff447ffcff1c80fcff8882fcff7283fcff8c85fcff8e8efcff488ffcffe48ffcff2298fcff229afcff709cfcffa09efcffec9efcffaaa1fcffaea1fcff0ea2fcff2aa2fcff6aabfcff5aaefcffa0aefcff64b1fcff6cb1fcffd0b1fcffd8b1fcff4eb7fcff50bafcff16bdfcffc679feffc879feff207afeff7c7afeffca88feffcc88feff4c8cfeff4aebfeff56edfeff8aeffeff88f2feff74f6feff6cf9feff96fbfeffb6fefeff4c12ffff7012ffff3c2cffff5436ffffc461ffffe661ffffe861ffffca64ffff0a65ffffe273ffff0474ffff0674ffffe67dffffdaa6ffff80a7ffff62a9ffff9aabffffb0acffffd4b1ffffaec1ffffc2c2ffff0ac3ffff06c8ffff10c8ffff9af7ffff26fbffff1a660000f6790000327a0000587a0000627c0000767c0000da7c0000007d0000fe9b00000a9c0000309c0000a69c0000b29c0000d89c0000eca00000f8a000001ea10000acb00000b6b00000dcb00000c4b50000c2b80000ccb80000f2b8000048d8000052d8000078d80000d8e500007ee9000088e90000aee90000d2ed000010f30000a2f30000d6f300005e0a0100ba0a0100401e0100541e01002c1f0100341f0100481f0100563201007c320100903501002a3601006e3d0100ec3d01000c3e0100cc490100d2490100f24901007e4c0100844c0100a44c0100b24f0100785601009a560100285901002e59010050590100
+      m_ExpandedIDs: 6af6fffffef6ffff42f7ffff2ef8ffff74f8ffffbcf8fffffcf8ffff3cf9ffffd8f9ffff1cfaffff26fbffff906700009a670000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -823,9 +823,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 547.9306, y: 287.97702, z: 1.7957577}
+    m_Target: {x: 522.3664, y: 310.3075, z: -2.554811}
     speed: 2
-    m_Value: {x: 547.9306, y: 287.97702, z: 1.7957577}
+    m_Value: {x: 522.3664, y: 310.3075, z: -2.554811}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -876,9 +876,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 370.4648
+    m_Target: 336.8774
     speed: 2
-    m_Value: 370.4648
+    m_Value: 336.8774
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -934,7 +934,7 @@ MonoBehaviour:
   m_SerializedViewNames: []
   m_SerializedViewValues: []
   m_PlayModeViewName: GameView
-  m_ShowGizmos: 0
+  m_ShowGizmos: 1
   m_TargetDisplay: 0
   m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
   m_TargetSize: {x: 1099, y: 592}
@@ -944,7 +944,7 @@ MonoBehaviour:
   m_EnterPlayModeBehavior: 0
   m_UseMipMap: 0
   m_VSyncEnabled: 0
-  m_Gizmos: 0
+  m_Gizmos: 1
   m_Stats: 0
   m_SelectedSizes: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
   m_ZoomArea:
