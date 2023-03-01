@@ -41,7 +41,7 @@ public class InstantiatePlayerPanel : MonoBehaviour
                 // 自分のplayerPanelの子objectのVoteButtonを押せないようにする
                 if (player.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                 {
-                    //playerPanel.transform.Find("VoteButton").GetComponent<Button>().interactable = false;
+                    playerPanel.transform.Find("VoteButton").GetComponent<Button>().interactable = false;
                 }
                 
             }
