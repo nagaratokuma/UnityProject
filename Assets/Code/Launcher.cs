@@ -185,7 +185,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     public void OnValueChanged(int value)
     {
         // 選択された問題を格納する
-        questionNumber = value;
+        questionNumber = value * 50 ;
 
         // 選択された問題の番号をルームのカスタムプロパティに格納する
         RoomHashtable["QD"] = questionNumber;

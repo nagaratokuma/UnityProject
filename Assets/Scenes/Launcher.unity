@@ -1515,6 +1515,10 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: "\u554F\u984CC"
       m_Image: {fileID: 0}
+    - m_Text: "\u554F\u984CD"
+      m_Image: {fileID: 0}
+    - m_Text: "\u554F\u984CE"
+      m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:

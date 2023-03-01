@@ -45,11 +45,21 @@ public class Result : MonoBehaviour
         // 全員正解だった場合
         else if (playerCount == correctCount)
         {
-            // ルームのカスタムプロパティに投票の正解を格納する
-            PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "VoteAnswer", 0 } });
-            resultText.text = "この中にバカが一人いました。バカを見つけてください。";
-            // 2秒後にQuizシーンに遷移する
-            Invoke("Vote", 2f);
+            // 50%の確率で以下を実行する
+            if (Random.Range(0, 2) == 0)
+            {
+                // ルームのカスタムプロパティに投票の正解を格納する
+                PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "VoteAnswer", 0 } });
+                resultText.text = "この中にバカが一人いました。バカを見つけてください。";
+                // 2秒後にvoteシーンに遷移する
+                Invoke("Vote", 2f);
+            }
+            else
+            {
+                resultText.text = "正解したのは" + correctCount + "人でした。次の問題に進みます。";
+                // 2秒後にQuizシーンに遷移する
+                Invoke("Quiz", 2f);
+            }
         }
         else
         {
