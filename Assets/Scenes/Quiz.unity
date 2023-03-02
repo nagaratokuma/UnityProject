@@ -233,7 +233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   csvFile: {fileID: 4900000, guid: d959d3753959dee42a29d54bf988b46b, type: 3}
-  MaxQuizNum: 2
+  MaxQuizNum: 50
   answerInputField: {fileID: 1743655628}
   questionText: {fileID: 1559448846}
   QuizNumber: {fileID: 158645776}

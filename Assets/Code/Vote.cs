@@ -348,7 +348,7 @@ public class Vote : MonoBehaviourPunCallbacks
                 // バカを表示するときは解答を表示する
                 if (isBaka == true)
                 {
-                    if (player.CustomProperties.ContainsKey("Answer") == null)
+                    if (player.CustomProperties.ContainsKey("Answer") == false)
                     {
                         // AnswerTextを設定する
                         upperPanel.transform.Find(player.ActorNumber.ToString()).Find("Answer").GetComponent<Text>().text = "解答なし";

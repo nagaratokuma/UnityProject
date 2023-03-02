@@ -13,7 +13,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
     public TextAsset csvFile;// GUIでcsvファイルを割当
 
     // Quizの問題数
-    public int MaxQuizNum = 2;
+    public int MaxQuizNum = 50;
 
     // AnswerInputField
     public InputField answerInputField;
