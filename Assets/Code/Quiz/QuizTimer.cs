@@ -26,7 +26,7 @@ public class QuizTimer : MonoBehaviour
         // シーンがQuizの時は
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Quiz")
         {
-            LimitTime = 25;
+            LimitTime = 60;
         }
         // シーンがVoteの時は
         else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Vote")
@@ -78,7 +78,6 @@ public class QuizTimer : MonoBehaviour
                     IsTimeOver = false;
 
                 }
-                
             }
         }
     }
