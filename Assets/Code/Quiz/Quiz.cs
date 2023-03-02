@@ -44,6 +44,9 @@ public class Quiz : MonoBehaviourPunCallbacks {
     // Playerの正誤を格納する辞書
     Dictionary<string, bool> playerAnswer = new Dictionary<string, bool>();
     
+    // 解答を格納する変数
+    public string answer;
+
     private Hashtable RoomHashtable = new ExitGames.Client.Photon.Hashtable();
 
     void Awake(){
@@ -119,7 +122,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
     // AnswerButtonを押したときに呼ばれる関数
     public void AnswerButton(){
         // AnswerInputFieldのテキストを取得
-        string answer = answerInputField.text;
+       //answer = answerInputField.text;
 
         // 答え合わせ
         if (csvDatas [questionNumber] [2] == answer) {
@@ -131,6 +134,12 @@ public class Quiz : MonoBehaviourPunCallbacks {
 
         // 正誤判定を送信
         SendPlayerAnswer(isCorrect, answer);   
+    }
+
+    // answerInputFieldの値が変更されたときに呼ばれる関数
+    public void OnValueChanged(){
+        // 解答を取得
+        answer = answerInputField.text;
     }
 
     // プレイヤーカスタムプロパティを受け取ったときに呼ばれる関数
