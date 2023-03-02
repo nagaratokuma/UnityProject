@@ -272,7 +272,11 @@ public class Vote : MonoBehaviourPunCallbacks
 
         // VotePanelを非表示にする
         VotePanel.SetActive(false);
-
+        
+        // クイズの問題番号を取得する
+        var qN = (int)PhotonNetwork.CurrentRoom.CustomProperties["QD"];
+        // BakaResultTextを設定する
+        BakaResultText.text = "正解は「<color=blue>" + Quiz.csvDatas[qN-1][2].Replace(Environment.NewLine, "") + "</color>」です。" + Environment.NewLine + "バカの正体は...";
         // BakaResultTextを表示する
         BakaResultText.gameObject.SetActive(true);
         // ３秒後にShowQuizResult()を呼び出す
