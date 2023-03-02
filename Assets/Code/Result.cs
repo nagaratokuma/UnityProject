@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
-
+using System;
 public class Result : MonoBehaviour
 {
     // 結果を表示するText
     public Text resultText;
+
+    // 次の問題に進むボタン
+    public Button nextButton;
 
     // Start is called before the first frame update
     void Start()
     {
         // 1秒後に結果を表示する
         Invoke("ShowResult", 1f);
-
+        
     }
 
     void ShowResult()
@@ -42,43 +45,35 @@ public class Result : MonoBehaviour
             // 2秒後にvoteシーンに遷移する
             Invoke("Vote", 2f);
         }
-        // 全員正解だった場合
-        else if (playerCount == correctCount)
-        {
-            // 50%の確率で以下を実行する
-            if (Random.Range(0, 2) == 0)
-            {
-                // ルームのカスタムプロパティに投票の正解を格納する
-                PhotonNetwork.CurrentRoom.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "VoteAnswer", 0 } });
-                resultText.text = "この中にバカが一人いました。バカを見つけてください。";
-                // 2秒後にvoteシーンに遷移する
-                Invoke("Vote", 2f);
-            }
-            else
-            {
-                resultText.text = "正解したのは" + correctCount + "人でした。次の問題に進みます。";
-                // 2秒後にQuizシーンに遷移する
-                Invoke("Quiz", 2f);
-            }
-        }
         else
         {
-            resultText.text = "正解したのは" + correctCount + "人でした。次の問題に進みます。";
+            // ルームのカスタムプロパティから問題番号を取得する
+            int qN = (int)PhotonNetwork.CurrentRoom.CustomProperties["QD"];
+            // 答えを表示する
+            resultText.text = "正解は「<color=yellow>" + Quiz.csvDatas[qN-1][2].Replace(Environment.NewLine, "") + "</color>」でした。" + Environment.NewLine;
+            resultText.text += "正解したのは" + correctCount + "人でした。";
+
+            // マスタークライアントのみ次の問題に進むボタンを表示する
+            if (PhotonNetwork.IsMasterClient)
+            {
+                nextButton.gameObject.SetActive(true);
+            }
             // 2秒後にQuizシーンに遷移する
-            Invoke("Quiz", 2f);
+            //Invoke("GoToQuiz", 2f);
         }
+    }
+
+    // 次の問題に進むボタンを押した時に呼ばれる関数
+    public void OnClickNextButton()
+    {
+        // Quizシーンをロード
+        PhotonNetwork.LoadLevel("Quiz");
     }
 
     // voteシーンに遷移する
     void Vote()
     {
         PhotonNetwork.LoadLevel("Vote");
-    }
-
-    // Quizシーンに遷移する
-    void Quiz()
-    {
-        PhotonNetwork.LoadLevel("Quiz");
     }
 
     // Update is called once per frame

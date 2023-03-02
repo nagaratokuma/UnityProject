@@ -39,7 +39,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
     // 問題番号を格納する変数
     public static int QuizNumInt = 1;
     // CSVのデータを入れるリスト
-    List<string[]> csvDatas = new List<string[]>();// 追記
+    public static List<string[]> csvDatas = new List<string[]>();// 追記
 
     // Playerの正誤を格納する辞書
     Dictionary<string, bool> playerAnswer = new Dictionary<string, bool>();
