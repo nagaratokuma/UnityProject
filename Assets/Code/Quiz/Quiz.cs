@@ -10,10 +10,9 @@ using UnityEngine.SceneManagement;
 
 public class Quiz : MonoBehaviourPunCallbacks {
     public static Quiz instance;
-    public TextAsset csvFile;// GUIでcsvファイルを割当
 
     // Quizの問題数
-    public int MaxQuizNum = 50;
+    public int MaxQuizNum;
 
     // AnswerInputField
     public InputField answerInputField;
@@ -38,8 +37,6 @@ public class Quiz : MonoBehaviourPunCallbacks {
 
     // 問題番号を格納する変数
     public static int QuizNumInt = 1;
-    // CSVのデータを入れるリスト
-    public static List<string[]> csvDatas = new List<string[]>();// 追記
 
     // Playerの正誤を格納する辞書
     Dictionary<string, bool> playerAnswer = new Dictionary<string, bool>();
@@ -47,7 +44,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
     // 解答を格納する変数
     public string answer;
 
-    private Hashtable RoomHashtable = new ExitGames.Client.Photon.Hashtable();
+    
 
     void Awake(){
         // PhotonNetwork.AutomaticallySyncScene を有効にするとマスタークライアントがシーンをロードすると他のクライアントも同じシーンをロードするようになる
@@ -75,7 +72,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
         // マスタークライアントの場合
         if (PhotonNetwork.IsMasterClient)
         {
-            // 50問終了したら
+            // 全問解答したらGameResultシーンに遷移
             if (QuizNumInt > MaxQuizNum)
             {
                 // GameResultシーンに遷移
@@ -92,14 +89,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
         questionText.text = "";
 
         // QuizNumberを表示
-        QuizNumber.text = "第" + QuizNumInt + "問";
-
-        // 格納
-        string[] lines = csvFile.text.Replace("\r\n", "\n").Split("\n"[0]);
-        foreach (var line in lines){
-            if (line == "") {continue;}
-            csvDatas.Add(line.Split(','));  // string[]を追加している
-        }
+        QuizNumber.text = "第" + (QuizNumInt) + "問";
 
         // 1秒後に問題文を表示する
         Invoke("ShowQuestion", 1.0f);
@@ -107,16 +97,30 @@ public class Quiz : MonoBehaviourPunCallbacks {
 
     // 問題文を表示する関数
     public void ShowQuestion(){
-        // ルームのカスタムプロパティから問題番号を取得
+        // ルームのカスタムプロパティから問題を取得
         // ルームのカスタムプロパティにQDがない場合は0を代入
+        Hashtable RoomHashtable = new ExitGames.Client.Photon.Hashtable();
         if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("QD") == false) {
             questionNumber = 0;
+            RoomHashtable.Add("QD", questionNumber);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
+            MaxQuizNum = 0;
         } else {
             questionNumber = (int)PhotonNetwork.CurrentRoom.CustomProperties["QD"];
+            MaxQuizNum = ReadCSV.csvDatasList[questionNumber].Count - 1;
+        }
+        // ルームのカスタムプロパティから問題番号を取得
+        // ルームのカスタムプロパティにQNがない場合は0を代入
+        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("QN") == false) {
+            QuizNumInt = 1;
+            RoomHashtable.Add("QN", QuizNumInt);
+            PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
+        } else {
+            QuizNumInt = (int)PhotonNetwork.CurrentRoom.CustomProperties["QN"];
         }
         Debug.Log("QD: " + questionNumber);
         // 問題文を表示
-        questionText.text = csvDatas [questionNumber] [1];
+        questionText.text = ReadCSV.csvDatasList[questionNumber] [QuizNumInt] [1];
     }
 
     // AnswerButtonを押したときに呼ばれる関数
@@ -125,7 +129,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
        //answer = answerInputField.text;
 
         // 答え合わせ
-        if (csvDatas [questionNumber] [2] == answer) {
+        if (ReadCSV.csvDatasList [questionNumber] [QuizNumInt] [2] == answer) {
             isCorrect = true;
         } else {
             isCorrect = false;
@@ -188,6 +192,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
                 //Debug.Log("正解した人数: " + correctCount);
                 
                 // 正解した人数をルームのカスタムプロパティに保存
+                Hashtable RoomHashtable = new ExitGames.Client.Photon.Hashtable();
                 RoomHashtable.Add("CC", correctCount);
                 PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
 
@@ -199,7 +204,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
                 if (PhotonNetwork.IsMasterClient)
                 {
                     // 問題番号をルームのカスタムプロパティに保存
-                    RoomHashtable.Add("QD", questionNumber);
+                    RoomHashtable.Add("QN", QuizNumInt);
                     PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
 
                     foreach (var player in PhotonNetwork.PlayerList)
