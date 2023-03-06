@@ -117,6 +117,22 @@ public class Vote : MonoBehaviourPunCallbacks
         }
         if (!changedProps.ContainsKey("Vote")) return;
 
+        // targetPlyaerのplayerPanelを取得する
+        var playerPanel = GameObject.Find(targetPlayer.ActorNumber.ToString());
+        if (playerPanel != null) 
+        {
+            // playerPanelの子オブジェクトのSpeechBalloonを取得する
+            var speechBalloon = playerPanel.transform.Find("SpeechBaloon").gameObject;
+            // speechBaloonの子オブジェクトのAnsweredを有効にする
+            speechBalloon.transform.Find("Answered").gameObject.SetActive(true);
+            // speechBalonnの子オブジェクトのAnsweringAnimを無効にする
+            speechBalloon.transform.Find("AnsweringAnim").gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("<color=red>playerPanelが見つかりませんでした。</color>");
+        }
+
         // ルームのカスタムプロパティから正解数を取得する
         int correctCount = (int)PhotonNetwork.CurrentRoom.CustomProperties["CC"];
 
@@ -274,7 +290,7 @@ public class Vote : MonoBehaviourPunCallbacks
         VotePanel.SetActive(false);
         
         // クイズの問題番号を取得する
-        var qN = (int)PhotonNetwork.CurrentRoom.CustomProperties["QD"];
+        var qN = HoldValue.questionNumber;
         int QuizNumInt = (int)PhotonNetwork.CurrentRoom.CustomProperties["QN"];
         // BakaResultTextを設定する
         BakaResultText.text = "正解は「<color=blue>" + ReadCSV.csvDatasList[qN][QuizNumInt-1][2].Replace(Environment.NewLine, "") + "</color>」です。" + Environment.NewLine + "バカの正体は...";

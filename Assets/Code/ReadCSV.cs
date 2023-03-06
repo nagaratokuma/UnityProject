@@ -4,13 +4,16 @@ using System;
 using UnityEngine;
 using NCMB;
 using UnityEngine.UI;
+using System.Linq;
 
 public class ReadCSV : MonoBehaviour {
     public EventHandler<byte[]> SourceFileLoadedEventHandler;   // データ取得成功時に送信するイベント
 
     public Dropdown selectQuiz;
     
-    // CSVのデータを入れるリストを入れるリスト
+    // CSVのデータを入れるリストを入れる辞書
+    public static Dictionary<string, List<string[]>> csvDatasDict = new Dictionary<string, List<string[]>>();// 追記
+
     public static List<List<string[]>> csvDatasList = new List<List<string[]>>();// 追記
     private void Awake ()
     {
@@ -21,9 +24,10 @@ public class ReadCSV : MonoBehaviour {
     {
         selectQuiz.ClearOptions();
         List<string> options = new List<string>();
-        for (int i = 0; i < csvDatasList.Count; i++)
+        foreach (var quiz in csvDatasDict)
         {
-            options.Add(csvDatasList[i][0][0] + "(" + (csvDatasList[i].Count - 1) + "問)");
+            options.Add(quiz.Key + "(" + (quiz.Value.Count - 1) + "問)");
+            csvDatasList.Add(quiz.Value);
         }
         selectQuiz.AddOptions(options);
     }
@@ -67,7 +71,7 @@ public class ReadCSV : MonoBehaviour {
                                 if (line == "") {continue;}
                                 csvDatas.Add(line.Split(','));  // string[]を追加している
                             }
-                            csvDatasList.Add(csvDatas);
+                            csvDatasDict.Add(file.FileName, csvDatas);
                             /*
                             if (selectQuiz)
                             {
@@ -87,7 +91,9 @@ public class ReadCSV : MonoBehaviour {
             }
 
         });
-
+        // csvDatasDictをkeyでソート
+        csvDatasDict.OrderBy(x => x.Key);
+        
         Invoke("setDropdown", 3.0f);
     }
 }

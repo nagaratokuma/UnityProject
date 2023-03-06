@@ -178,6 +178,8 @@ public class Launcher : MonoBehaviourPunCallbacks
         // ルーム内のプレイヤーがプレイ可能人数に達している場合、プレイ開始を通知する
         PhotonNetwork.CurrentRoom.IsOpen = false;
         PhotonNetwork.CurrentRoom.IsVisible = false;
+        // ドロップダウンで選択された値を記録する
+        HoldValue.SetQuestionNumber(questionNumber);
         PhotonNetwork.LoadLevel("Quiz");
     }
 

@@ -11,8 +11,12 @@ using UnityEngine.SceneManagement;
 public class Quiz : MonoBehaviourPunCallbacks {
     public static Quiz instance;
 
+    public ChangeImage changeImage;
     // Quizの問題数
     public int MaxQuizNum;
+    
+    // 問題の画像
+    public Image quizImage;
 
     // AnswerInputField
     public InputField answerInputField;
@@ -33,7 +37,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
     public bool isSent = false;
 
     // csvから参照するのに使う問題番号を格納する変数
-    public static int questionNumber = 1;
+    private int questionNumber = 1;
 
     // 問題番号を格納する変数
     public static int QuizNumInt = 1;
@@ -100,15 +104,8 @@ public class Quiz : MonoBehaviourPunCallbacks {
         // ルームのカスタムプロパティから問題を取得
         // ルームのカスタムプロパティにQDがない場合は0を代入
         Hashtable RoomHashtable = new ExitGames.Client.Photon.Hashtable();
-        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("QD") == false) {
-            questionNumber = 0;
-            RoomHashtable.Add("QD", questionNumber);
-            PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
-            MaxQuizNum = 0;
-        } else {
-            questionNumber = (int)PhotonNetwork.CurrentRoom.CustomProperties["QD"];
-            MaxQuizNum = ReadCSV.csvDatasList[questionNumber].Count - 1;
-        }
+        questionNumber = HoldValue.questionNumber;
+
         // ルームのカスタムプロパティから問題番号を取得
         // ルームのカスタムプロパティにQNがない場合は0を代入
         if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("QN") == false) {
@@ -121,6 +118,15 @@ public class Quiz : MonoBehaviourPunCallbacks {
         Debug.Log("QD: " + questionNumber);
         // 問題文を表示
         questionText.text = ReadCSV.csvDatasList[questionNumber] [QuizNumInt] [1];
+        // questionNumberが0の時
+        if (questionNumber == 0) {
+            // 13、37問目の時は画像を表示
+            if (QuizNumInt == 13 || QuizNumInt == 33 || QuizNumInt == 37 ) {
+                // 画像を表示
+                quizImage.gameObject.SetActive(true);
+                changeImage.setImage(QuizNumInt);
+            }
+        }
     }
 
     // AnswerButtonを押したときに呼ばれる関数
