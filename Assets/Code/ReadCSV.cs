@@ -14,6 +14,9 @@ public class ReadCSV : MonoBehaviour {
     // CSVのデータを入れるリストを入れる辞書
     public static Dictionary<string, List<string[]>> csvDatasDict = new Dictionary<string, List<string[]>>();// 追記
 
+    // 画像のリストを入れる辞書
+    public static Dictionary<string, List<Texture2D>> pngDatasDict = new Dictionary<string, List<Texture2D>>();// 追記
+    
     public static List<List<string[]>> csvDatasList = new List<List<string[]>>();// 追記
     private void Awake ()
     {
@@ -32,15 +35,20 @@ public class ReadCSV : MonoBehaviour {
         selectQuiz.AddOptions(options);
     }
     
+    
     public void GetQuiz()
     {
         NCMBQuery<NCMBFile> query = NCMBFile.GetQuery ();
         //selectQuiz.ClearOptions();
+        Hashtable where = new Hashtable();
+        where.Add("$regex", ".*\\.csv$");
+        query.WhereEqualTo("fileName", where);
+        //query.WhereContainedInArray("fileName", new List<string> { "test...."});
 
-        //query.WhereContainedInArray("fileName", new List<string> { "Quiz.csv"});
-
-        query.WhereNotEqualTo("fileName", "hogehoge");
+        //query.WhereNotEqualTo("fileName", "hogehoge");
         query.FindAsync ((List<NCMBFile> objList, NCMBException error) => {
+            // 検索結果をファイル名でソート
+            objList = objList.OrderBy(x => x.FileName).ToList();
             if (error != null) {
                 // 検索失敗
                 Debug.Log ( "Source File Load Failed" );
@@ -81,9 +89,9 @@ public class ReadCSV : MonoBehaviour {
                             }
                             */
                             // 書き出し
-                            Debug.Log (csvDatas.Count); // 行数
-                            Debug.Log (csvDatas[0].Length); // 項目数
-                            Debug.Log (csvDatas [1] [1]);   // 2行目2列目
+                            //Debug.Log (csvDatas.Count); // 行数
+                            //Debug.Log (csvDatas[0].Length); // 項目数
+                            //Debug.Log (csvDatas [1] [1]);   // 2行目2列目
                         }
                     });
                     

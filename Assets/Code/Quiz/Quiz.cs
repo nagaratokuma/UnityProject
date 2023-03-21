@@ -119,10 +119,11 @@ public class Quiz : MonoBehaviourPunCallbacks {
         // 問題文を表示
         questionText.text = ReadCSV.csvDatasList[questionNumber] [QuizNumInt] [1];
         // questionNumberが0の時
-        if (questionNumber == 0) {
+        if (true) {
             // 13、37問目の時は画像を表示
-            if (QuizNumInt == 13 || QuizNumInt == 33 || QuizNumInt == 37 ) {
+            if (QuizNumInt == 40 || QuizNumInt == 6 || QuizNumInt == 5 || QuizNumInt == 2 || QuizNumInt ==  49 || QuizNumInt ==  45 || QuizNumInt ==  48 || QuizNumInt == 9 ) {
                 // 画像を表示
+                Debug.Log("画像を表示");
                 quizImage.gameObject.SetActive(true);
                 changeImage.setImage(QuizNumInt);
             }
