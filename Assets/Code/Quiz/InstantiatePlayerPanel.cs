@@ -34,8 +34,7 @@ public class InstantiatePlayerPanel : MonoBehaviour
             if (SceneManager.GetActiveScene().name == "Vote")
             {
                 Debug.Log("Vote");
-                // playerPanelの子objectのSpeechBaloonを無効にする
-                playerPanel.transform.Find("SpeechBaloon").gameObject.SetActive(false);
+                // 自分以外のplayerPanelの子objectのVoteButtonを押せるようにする
                 playerPanel.transform.Find("VoteButton").gameObject.SetActive(true);
 
                 // 自分のplayerPanelの子objectのVoteButtonを押せないようにする

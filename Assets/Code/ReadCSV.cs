@@ -4,13 +4,19 @@ using System;
 using UnityEngine;
 using NCMB;
 using UnityEngine.UI;
+using System.Linq;
 
 public class ReadCSV : MonoBehaviour {
     public EventHandler<byte[]> SourceFileLoadedEventHandler;   // データ取得成功時に送信するイベント
 
     public Dropdown selectQuiz;
     
-    // CSVのデータを入れるリストを入れるリスト
+    // CSVのデータを入れるリストを入れる辞書
+    public static Dictionary<string, List<string[]>> csvDatasDict = new Dictionary<string, List<string[]>>();// 追記
+
+    // 画像のリストを入れる辞書
+    public static Dictionary<string, List<Texture2D>> pngDatasDict = new Dictionary<string, List<Texture2D>>();// 追記
+    
     public static List<List<string[]>> csvDatasList = new List<List<string[]>>();// 追記
     private void Awake ()
     {
@@ -21,22 +27,28 @@ public class ReadCSV : MonoBehaviour {
     {
         selectQuiz.ClearOptions();
         List<string> options = new List<string>();
-        for (int i = 0; i < csvDatasList.Count; i++)
+        foreach (var quiz in csvDatasDict)
         {
-            options.Add(csvDatasList[i][0][0] + "(" + (csvDatasList[i].Count - 1) + "問)");
+            options.Add(quiz.Key + "(" + (quiz.Value.Count - 1) + "問)");
+            csvDatasList.Add(quiz.Value);
         }
         selectQuiz.AddOptions(options);
     }
+    
     
     public void GetQuiz()
     {
         NCMBQuery<NCMBFile> query = NCMBFile.GetQuery ();
         //selectQuiz.ClearOptions();
+        Hashtable where = new Hashtable();
+        where.Add("$regex", ".*\\.csv$");
+        query.WhereEqualTo("fileName", where);
+        //query.WhereContainedInArray("fileName", new List<string> { "test...."});
 
-        //query.WhereContainedInArray("fileName", new List<string> { "Quiz.csv"});
-
-        query.WhereNotEqualTo("fileName", "hogehoge");
+        //query.WhereNotEqualTo("fileName", "hogehoge");
         query.FindAsync ((List<NCMBFile> objList, NCMBException error) => {
+            // 検索結果をファイル名でソート
+            objList = objList.OrderBy(x => x.FileName).ToList();
             if (error != null) {
                 // 検索失敗
                 Debug.Log ( "Source File Load Failed" );
@@ -67,7 +79,7 @@ public class ReadCSV : MonoBehaviour {
                                 if (line == "") {continue;}
                                 csvDatas.Add(line.Split(','));  // string[]を追加している
                             }
-                            csvDatasList.Add(csvDatas);
+                            csvDatasDict.Add(file.FileName, csvDatas);
                             /*
                             if (selectQuiz)
                             {
@@ -77,9 +89,9 @@ public class ReadCSV : MonoBehaviour {
                             }
                             */
                             // 書き出し
-                            Debug.Log (csvDatas.Count); // 行数
-                            Debug.Log (csvDatas[0].Length); // 項目数
-                            Debug.Log (csvDatas [1] [1]);   // 2行目2列目
+                            //Debug.Log (csvDatas.Count); // 行数
+                            //Debug.Log (csvDatas[0].Length); // 項目数
+                            //Debug.Log (csvDatas [1] [1]);   // 2行目2列目
                         }
                     });
                     
@@ -87,7 +99,9 @@ public class ReadCSV : MonoBehaviour {
             }
 
         });
-
+        // csvDatasDictをkeyでソート
+        csvDatasDict.OrderBy(x => x.Key);
+        
         Invoke("setDropdown", 3.0f);
     }
 }

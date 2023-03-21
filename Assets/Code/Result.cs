@@ -48,7 +48,7 @@ public class Result : MonoBehaviour
         else
         {
             // ルームのカスタムプロパティから問題番号を取得する
-            int qN = (int)PhotonNetwork.CurrentRoom.CustomProperties["QD"];
+            int qN = HoldValue.questionNumber;
             int QuizNumInt = (int)PhotonNetwork.CurrentRoom.CustomProperties["QN"];
             // 答えを表示する
             resultText.text = "正解は「<color=yellow>" + ReadCSV.csvDatasList[qN][QuizNumInt-1][2].Replace(Environment.NewLine, "") + "</color>」でした。" + Environment.NewLine;
