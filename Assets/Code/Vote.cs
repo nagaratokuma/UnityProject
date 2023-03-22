@@ -272,8 +272,45 @@ public class Vote : MonoBehaviourPunCallbacks
     // NextButtonが押されたときに呼び出される
     public void OnClickNextButtonMethod()
     {
-        // Quizシーンをロードする
-        PhotonNetwork.LoadLevel("Quiz");
+        // ルームのカスタムプロパティから問題番号を取得する
+        int qN = HoldValue.questionNumber;
+        int QuizNumInt = (int)PhotonNetwork.CurrentRoom.CustomProperties["QN"];
+
+        // 問題数が最大値を超えていたら
+        if (QuizNumInt > HoldValue.MaxQuizNum)
+        {
+            // GameResultシーンをロード
+            PhotonNetwork.LoadLevel("GameResult");
+        }
+        else 
+        {
+            // 次の問題のタイプを取得する
+            int QuizType = int.Parse(ReadCSV.csvDatasList[qN] [QuizNumInt] [0]);
+        
+            // 問題のタイプが1の時
+            if (QuizType == 1)
+            {
+                Debug.Log("<color=yellow>Quiz1をロード</color>");
+                // Quizシーンをロード
+                PhotonNetwork.LoadLevel("Quiz");
+            }
+            else if (QuizType == 2)
+            {
+                Debug.Log("<color=yellow>Quiz2をロード</color>");
+                // Quiz2シーンをロード
+                PhotonNetwork.LoadLevel("Quiz2");
+            }
+            else if (QuizType == 3)
+            {
+                Debug.Log("<color=yellow>Quiz3をロード</color>");
+                // Quiz3シーンをロード
+                PhotonNetwork.LoadLevel("Quiz3");
+            }       
+            else 
+            {
+                Debug.Log("問題のタイプが不正です。");
+            } 
+        }
     }
 
     public void ShowBakaResultText()

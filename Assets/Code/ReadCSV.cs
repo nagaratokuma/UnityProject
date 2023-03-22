@@ -21,6 +21,7 @@ public class ReadCSV : MonoBehaviour {
     private void Awake ()
     {
         Invoke("GetQuiz", 1.0f);
+        
     }
 
     public void setDropdown()
@@ -102,6 +103,6 @@ public class ReadCSV : MonoBehaviour {
         // csvDatasDictをkeyでソート
         csvDatasDict.OrderBy(x => x.Key);
         
-        Invoke("setDropdown", 3.0f);
+        Invoke("setDropdown", 2.0f);
     }
 }

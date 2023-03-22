@@ -46,6 +46,14 @@ public class Launcher : MonoBehaviourPunCallbacks
         // PhotonNetwork.AutomaticallySyncScene を有効にするとマスタークライアントがシーンをロードすると他のクライアントも同じシーンをロードするようになる
         PhotonNetwork.AutomaticallySyncScene = true;
         
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 選択された問題の番号をルームのカスタムプロパティに格納する
+            RoomHashtable["QD"] = questionNumber;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
+        }
+        
+
     }
     // Start is called before the first frame update
     private void Start() {
@@ -180,7 +188,12 @@ public class Launcher : MonoBehaviourPunCallbacks
         PhotonNetwork.CurrentRoom.IsVisible = false;
         // ドロップダウンで選択された値を記録する
         HoldValue.SetQuestionNumber(questionNumber);
-        PhotonNetwork.LoadLevel("Quiz");
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // マスタークライアントだけが問題をロードする
+            LoadQuizScene();
+        }
     }
 
     // QuizDropDownの値が変更された時に呼ばれる
@@ -203,5 +216,28 @@ public class Launcher : MonoBehaviourPunCallbacks
         return questionNumber;
     }
 
+    private void LoadQuizScene()
+    {
+        // 問題数を取得する
+        int quizCount = ReadCSV.csvDatasList[questionNumber].Count - 1;
+        HoldValue.SetMaxQuizNum(quizCount);
+        Debug.Log("quizCount = " + quizCount);
+        if (int.Parse(ReadCSV.csvDatasList[questionNumber][1][0]) == 1)
+        {
+            PhotonNetwork.LoadLevel("Quiz");
+        }
+        else if (int.Parse(ReadCSV.csvDatasList[questionNumber][1][0]) == 2)
+        {
+            PhotonNetwork.LoadLevel("Quiz2");
+        }        
+        else if (int.Parse(ReadCSV.csvDatasList[questionNumber][1][0]) == 3)
+        {
+            PhotonNetwork.LoadLevel("Quiz3");
+        }
+        else
+        {
+            Debug.Log("問題の読み込みに失敗しました");
+        }
+    }
 
 }

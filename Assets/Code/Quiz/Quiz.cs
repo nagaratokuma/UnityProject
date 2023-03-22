@@ -12,8 +12,6 @@ public class Quiz : MonoBehaviourPunCallbacks {
     public static Quiz instance;
 
     public ChangeImage changeImage;
-    // Quizの問題数
-    public int MaxQuizNum;
     
     // 問題の画像
     public Image quizImage;
@@ -38,9 +36,6 @@ public class Quiz : MonoBehaviourPunCallbacks {
 
     // csvから参照するのに使う問題番号を格納する変数
     private int questionNumber = 1;
-
-    // 問題番号を格納する変数
-    public static int QuizNumInt = 1;
 
     // Playerの正誤を格納する辞書
     Dictionary<string, bool> playerAnswer = new Dictionary<string, bool>();
@@ -77,7 +72,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
         if (PhotonNetwork.IsMasterClient)
         {
             // 全問解答したらGameResultシーンに遷移
-            if (QuizNumInt > MaxQuizNum)
+            if (HoldValue.QuizNumInt > HoldValue.MaxQuizNum)
             {
                 // GameResultシーンに遷移
                 PhotonNetwork.LoadLevel("GameResult");
@@ -93,7 +88,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
         questionText.text = "";
 
         // QuizNumberを表示
-        QuizNumber.text = "第" + (QuizNumInt) + "問";
+        QuizNumber.text = "第" + (HoldValue.QuizNumInt) + "問";
 
         // 1秒後に問題文を表示する
         Invoke("ShowQuestion", 1.0f);
@@ -109,25 +104,17 @@ public class Quiz : MonoBehaviourPunCallbacks {
         // ルームのカスタムプロパティから問題番号を取得
         // ルームのカスタムプロパティにQNがない場合は0を代入
         if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("QN") == false) {
-            QuizNumInt = 1;
-            RoomHashtable.Add("QN", QuizNumInt);
+            HoldValue.QuizNumInt = 1;
+            RoomHashtable.Add("QN", HoldValue.QuizNumInt);
             PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
         } else {
-            QuizNumInt = (int)PhotonNetwork.CurrentRoom.CustomProperties["QN"];
+            HoldValue.QuizNumInt = (int)PhotonNetwork.CurrentRoom.CustomProperties["QN"];
         }
         Debug.Log("QD: " + questionNumber);
+
         // 問題文を表示
-        questionText.text = ReadCSV.csvDatasList[questionNumber] [QuizNumInt] [1];
-        // questionNumberが0の時
-        if (true) {
-            // 13、37問目の時は画像を表示
-            if (QuizNumInt == 40 || QuizNumInt == 6 || QuizNumInt == 5 || QuizNumInt == 2 || QuizNumInt ==  49 || QuizNumInt ==  45 || QuizNumInt ==  48 || QuizNumInt == 9 ) {
-                // 画像を表示
-                Debug.Log("画像を表示");
-                quizImage.gameObject.SetActive(true);
-                changeImage.setImage(QuizNumInt);
-            }
-        }
+        questionText.text = ReadCSV.csvDatasList[questionNumber] [HoldValue.QuizNumInt] [1];
+        
     }
 
     // AnswerButtonを押したときに呼ばれる関数
@@ -136,7 +123,7 @@ public class Quiz : MonoBehaviourPunCallbacks {
        //answer = answerInputField.text;
 
         // 答え合わせ
-        if (ReadCSV.csvDatasList [questionNumber] [QuizNumInt] [2] == answer) {
+        if (ReadCSV.csvDatasList [questionNumber] [HoldValue.QuizNumInt] [2] == answer) {
             isCorrect = true;
         } else {
             isCorrect = false;
@@ -205,13 +192,13 @@ public class Quiz : MonoBehaviourPunCallbacks {
 
                 // 問題番号を更新
                 questionNumber++;
-                QuizNumInt++;
+                HoldValue.QuizNumInt++;
 
                 // マスタークライアントのみが次のシーンをロードする
                 if (PhotonNetwork.IsMasterClient)
                 {
                     // 問題番号をルームのカスタムプロパティに保存
-                    RoomHashtable.Add("QN", QuizNumInt);
+                    RoomHashtable.Add("QN", HoldValue.QuizNumInt);
                     PhotonNetwork.CurrentRoom.SetCustomProperties(RoomHashtable);
 
                     foreach (var player in PhotonNetwork.PlayerList)
@@ -235,11 +222,9 @@ public class Quiz : MonoBehaviourPunCallbacks {
 
         var hashtable = new ExitGames.Client.Photon.Hashtable();
 
-        // 不正解だった場合のみ解答を送信
-        if (isCorrect == false)
-        {
-            hashtable.Add("Answer", Answer);
-        }
+        // 解答を送信
+        hashtable.Add("Answer", Answer);
+        
         Debug.Log("プレイヤーカスタムプロパティを送信");
         // カスタムプロパティを送信
         

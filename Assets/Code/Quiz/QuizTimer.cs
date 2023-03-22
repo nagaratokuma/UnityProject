@@ -28,11 +28,22 @@ public class QuizTimer : MonoBehaviour
         {
             LimitTime = 60;
         }
+        // シーンがQuiz2の時は
+        else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Quiz2")
+        {
+            LimitTime = 60;
+        }
+        // シーンがQuiz3の時は
+        else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Quiz3")
+        {
+            LimitTime = 300;
+        }
         // シーンがVoteの時は
         else if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Vote")
         {
             LimitTime = 60;
         }
+        
         rectTransform = gameObject.GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(width, height);
     }
